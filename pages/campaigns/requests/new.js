@@ -10,6 +10,7 @@ class RequestNew extends Component {
     value: "",
     description: "",
     recipient: "",
+    deadline: "",
     loading: false,
     errorMessage: "",
   };
@@ -24,14 +25,14 @@ class RequestNew extends Component {
     event.preventDefault();
 
     const campaign = Campaign(this.props.address);
-    const { description, value, recipient } = this.state;
+    const { description, value, recipient, deadline } = this.state;
 
     this.setState({ loading: true, errorMessage: "" });
 
     try {
       const accounts = await web3.eth.getAccounts();
       await campaign.methods
-        .createRequest(description, web3.utils.toWei(value, "ether"), recipient)
+        .createRequest(description, web3.utils.toWei(value, "ether"), recipient, deadline)
         .send({ from: accounts[0] });
       Router.pushRoute(`/campaigns/${this.props.address}/requests`);
     } catch (err) {
@@ -70,6 +71,15 @@ class RequestNew extends Component {
               value={this.state.recipient}
               onChange={(event) =>
                 this.setState({ recipient: event.target.value })
+              }
+            />
+          </Form.Field>
+          <Form.Field>
+            <label>Expiration minutes</label>
+            <Input
+              value={this.state.deadline}
+              onChange={(event) =>
+                this.setState({ deadline: event.target.value })
               }
             />
           </Form.Field>

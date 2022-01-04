@@ -60,6 +60,7 @@ class RequestIndex extends Component {
               <HeaderCell>Approval Count</HeaderCell>
               <HeaderCell>Approve</HeaderCell>
               <HeaderCell>Finalize</HeaderCell>
+              <HeaderCell>Expiration Date</HeaderCell>
             </Row>
           </Header>
           <Body>{this.renderRows()}</Body>

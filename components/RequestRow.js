@@ -25,7 +25,10 @@ class RequestRow extends Component {
   render() {
     const { Row, Cell } = Table;
     const { id, request, approversCount } = this.props;
-    const readyToFinalize = request.approvalCount > approversCount / 2;
+    const readyToFinalize = request.approvalCount > approversCount / 2; //Next feature
+    const deadlineTimestamp = parseInt(request.deadline);
+    const millisecondsDeadLine = deadlineTimestamp*1000;
+    var date = new Date(millisecondsDeadLine).toUTCString();
 
     return (
       <Row
@@ -53,9 +56,11 @@ class RequestRow extends Component {
             </Button>
           )}
         </Cell>
+        <Cell>{date}</Cell>
       </Row>
     );
   }
 }
 
 export default RequestRow;
+

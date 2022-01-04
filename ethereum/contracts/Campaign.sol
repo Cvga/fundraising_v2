@@ -18,6 +18,7 @@ contract Campaign {
         string description;
         uint value;
         address recipient;
+        uint256 deadline;
         bool complete;
         uint approvalCount;
         mapping(address => bool) approvals;
@@ -28,6 +29,7 @@ contract Campaign {
     uint public minimumContribution;
     mapping(address => bool) public approvers;
     uint public approversCount;
+    uint256 public deadline;
 
     modifier restricted() {
         require(msg.sender == manager);
@@ -46,15 +48,16 @@ contract Campaign {
         approversCount++;
     }
 
-    function createRequest(string description, uint value, address recipient) public restricted {
+    function createRequest(string description, uint value, address recipient, uint256 numberOfMinutes) public restricted {
         Request memory newRequest = Request({
            description: description,
            value: value,
            recipient: recipient,
+           deadline : now + (numberOfMinutes * 1 minutes),
            complete: false,
            approvalCount: 0
         });
-
+        deadline = now + (numberOfMinutes * 1 minutes);
         requests.push(newRequest);
     }
 
@@ -70,7 +73,7 @@ contract Campaign {
 
     function finalizeRequest(uint index) public restricted {
         Request storage request = requests[index];
-
+        require(now >= request.deadline);
         require(request.approvalCount > (approversCount / 2));
         require(!request.complete);
 
@@ -79,13 +82,14 @@ contract Campaign {
     }
     
     function getSummary() public view returns (
-      uint, uint, uint, uint, address
+      uint, uint, uint, uint, uint, address
       ) {
         return (
           minimumContribution,
           this.balance,
           requests.length,
           approversCount,
+          deadline,
           manager
         );
     }
