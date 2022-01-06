@@ -3,8 +3,8 @@ pragma solidity ^0.4.17;
 contract CampaignFactory {
     address[] public deployedCampaigns;
 
-    function createCampaign(uint minimum) public {
-        address newCampaign = new Campaign(minimum, msg.sender);
+    function createCampaign(uint minimum, string campaingName) public {
+        address newCampaign = new Campaign(minimum, campaingName, msg.sender);
         deployedCampaigns.push(newCampaign);
     }
 
@@ -30,15 +30,17 @@ contract Campaign {
     mapping(address => bool) public approvers;
     uint public approversCount;
     uint256 public deadline;
+    string public campaingName;
 
     modifier restricted() {
         require(msg.sender == manager);
         _;
     }
 
-    function Campaign(uint minimum, address creator) public {
+    function Campaign(uint minimum, string name, address creator) public {
         manager = creator;
         minimumContribution = minimum;
+        campaingName = name;
     }
 
     function contribute() public payable {
@@ -63,7 +65,7 @@ contract Campaign {
 
     function approveRequest(uint index) public {
         Request storage request = requests[index];
-
+        require(now < request.deadline);
         require(approvers[msg.sender]);
         require(!request.approvals[msg.sender]);
 
@@ -73,7 +75,7 @@ contract Campaign {
 
     function finalizeRequest(uint index) public restricted {
         Request storage request = requests[index];
-        require(now >= request.deadline);
+        require(now < request.deadline);
         require(request.approvalCount > (approversCount / 2));
         require(!request.complete);
 
@@ -82,7 +84,7 @@ contract Campaign {
     }
     
     function getSummary() public view returns (
-      uint, uint, uint, uint, uint, address
+      uint, uint, uint, uint, uint, address,string
       ) {
         return (
           minimumContribution,
@@ -90,7 +92,8 @@ contract Campaign {
           requests.length,
           approversCount,
           deadline,
-          manager
+          manager,
+          campaingName
         );
     }
     
