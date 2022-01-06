@@ -30,7 +30,7 @@ class RequestRow extends Component {
     const millisecondsDeadLine = deadlineTimestamp*1000;
     const date = new Date(millisecondsDeadLine).toUTCString();
     const dateTime = Date.now();
-    const status = dateTime < millisecondsDeadLine ? "Opened":
+    const status = dateTime < millisecondsDeadLine && !request.complete ? "Opened":
                    dateTime > millisecondsDeadLine && !request.complete ? "Expired":
                    request.complete ? "Success" : "N/A";
     
